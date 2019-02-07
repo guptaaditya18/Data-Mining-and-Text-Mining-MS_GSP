@@ -8,7 +8,7 @@ public class Sequence {
         return transactionSequence;
     }
 
-    public Sequence(List<List<Item>> samples) {
+    public Sequence(List<Set<Item>> samples) {
         this.samples = samples;
     }
 
@@ -16,15 +16,15 @@ public class Sequence {
         this.transactionSequence = transactionSequence;
     }
 
-    public List<List<Item>> getSamples() {
+    public List<Set<Item>> getSamples() {
         return samples;
     }
 
-    public void setSamples(List<List<Item>> samples) {
+    public void setSamples(List<Set<Item>> samples) {
         this.samples = samples;
     }
 
     List<HashMap<Item,Integer>> transactionSequence;
-    List<List<Item>> samples;
+    List<Set<Item>> samples;
 
 }

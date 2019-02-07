@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Activity {
     public static void main(String[] args) throws IOException{
@@ -20,12 +22,9 @@ public class Activity {
     }
 
     private static List<Sequence> getInput() {
-        return getDummyInput();
+        InputData input = new InputData();
+        return input.getDummyInput();
     }
 
-    private static List<Sequence> getDummyInput() {
-        List<Sequence> sequences=new ArrayList<>();
-        //sequences.add(new Sequence());
-        return new ArrayList<>();
-    }
+
 }
