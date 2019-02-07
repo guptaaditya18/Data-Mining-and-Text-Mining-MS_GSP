@@ -12,7 +12,7 @@ public class Activity {
     }
 
     private static void execute(List<Sequence> inputSequence) {
-        
+
     }
 
     private static List<Sequence> getOutput() {
@@ -20,6 +20,12 @@ public class Activity {
     }
 
     private static List<Sequence> getInput() {
+        return getDummyInput();
+    }
+
+    private static List<Sequence> getDummyInput() {
+        List<Sequence> sequences=new ArrayList<>();
+        //sequences.add(new Sequence());
         return new ArrayList<>();
     }
 }
