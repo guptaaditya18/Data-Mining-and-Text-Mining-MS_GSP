@@ -1,12 +1,11 @@
 public class ItemDetail {
-    Item item;
-    double minSup;
-    int count;
+    private Item item;
+    private double minSup;
+    private int count;
 
-    public ItemDetail(Item item, double minSup, int count) {
+    public ItemDetail(Item item, double minSup) {
         this.item = item;
         this.minSup = minSup;
-        this.count = count;
     }
 
     public Item getItem() {
