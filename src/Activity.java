@@ -10,6 +10,7 @@ public class Activity {
         execute(inputSequence);
         List<Sequence> outpuSequence=getOutput();
         //return outpuSequence;
+        System.out.println("Snoop");
 
     }
 
