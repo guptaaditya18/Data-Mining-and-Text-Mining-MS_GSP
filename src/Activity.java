@@ -9,6 +9,7 @@ public class Activity {
         List<Sequence> inputSequence=getInput();
         execute(inputSequence);
         List<Sequence> outpuSequence=getOutput();
+        System.out.println("");
         //return outpuSequence;
 
     }
