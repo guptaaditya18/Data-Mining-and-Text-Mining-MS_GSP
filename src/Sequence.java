@@ -1,30 +1,20 @@
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
 public class Sequence {
-
-    public List<HashMap<Item, Integer>> getTransactionSequence() {
-        return transactionSequence;
+    public Sequence(List<Set<Integer>> sequenceData) {
+        this.sequenceData = sequenceData;
     }
 
-    public Sequence(List<Set<Item>> samples) {
-        this.samples = samples;
+
+    public List<Set<Integer>> getSequenceData() {
+        return sequenceData;
     }
 
-    public void setTransactionSequence(List<HashMap<Item, Integer>> transactionSequence) {
-        this.transactionSequence = transactionSequence;
+    public void setSequenceData(List<Set<Integer>> sequenceData) {
+        this.sequenceData = sequenceData;
     }
 
-    public List<Set<Item>> getSamples() {
-        return samples;
-    }
-
-    public void setSamples(List<Set<Item>> samples) {
-        this.samples = samples;
-    }
-
-    List<HashMap<Item,Integer>> transactionSequence;
-    List<Set<Item>> samples;
+    List<Set<Integer>> sequenceData;
 
 }

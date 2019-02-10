@@ -5,28 +5,17 @@ import java.util.Set;
 
 public class Activity {
     public static void main(String[] args) throws IOException{
-        List<Sequence> inputSequence=getInput();
-        printSequence(inputSequence);
-        execute(inputSequence);
+        Data inputSequence=getInput();
+        //Util.printSequence(inputSequence.getSequences());
+        //execute(inputSequence);
         List<Sequence> outpuSequence=getOutput();
         System.out.println("");
-        //return outpuSequence;
+        MSGSPAlgo algo=new MSGSPAlgo();
+
+        algo.getFinalSequence(inputSequence);
 
     }
-    public static void printSequence(List<Sequence> sequence){
-        for(Sequence s: sequence){
-            System.out.print("<");
-            for(Set<Item> sets: s.getSamples()){
-                System.out.print("{");
-                for(Item i: sets){
-                    System.out.print(i.getName()+",");
-                }
-                System.out.print("}");
 
-            }
-            System.out.println(">");
-        }
-    }
 
     private static void execute(List<Sequence> inputSequence) {
 
@@ -36,10 +25,8 @@ public class Activity {
         return new ArrayList<>();
     }
 
-    private static List<Sequence> getInput() {
+    private static Data getInput() {
         InputDataUtil input = new InputDataUtil();
-//        return input.getDummyInput().getSequences();
-
         return input.parseTxt();
     }
 

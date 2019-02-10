@@ -24,15 +24,15 @@ public class InputDataUtil {
                 List<String> seq2 = Arrays.asList(seq1.split("}\\{"));
                 int len2 = seq2.size();
 
-                List<Set<Item>> seq3=new ArrayList<>();
+                List<Set<Integer>> seq3=new ArrayList<>();
 
                 for (int i = 0; i < len2; i++) {
                     List<String> items = Arrays.asList(seq2.get(i).split(", "));
-                    Set<Item> set1=new HashSet<>();
+                    Set<Integer> set1=new HashSet<>();
 
                     int len3 = items.size();
                     for(int j = 0; j < len3; j++){
-                        Item it = new Item(items.get(j));
+                        Integer it = Integer.parseInt(items.get(j));
                         set1.add(it);
                     }
                     seq3.add(set1);
@@ -53,7 +53,7 @@ public class InputDataUtil {
         HashMap<Integer, Double> mis = new HashMap<>();
         Double sdc = 0.0;
         try{
-            BufferedReader br = new BufferedReader(new FileReader("Data/src/sample.txt"));
+            BufferedReader br = new BufferedReader(new FileReader("Data/src/mis.txt"));
             String line;
             while((line = br.readLine()) != null) {
                 if(line.charAt(0) == 'S'){
@@ -63,8 +63,8 @@ public class InputDataUtil {
                     sdc = db;
 
                 }else {
-                    int len1 = rwline.length();
-                    String seq1 = line.substring(4, len1 - 1);
+                    int len1 = line.length();
+                    String seq1 = line.substring(4, len1 );
                     List<String> seq2 = Arrays.asList(seq1.split("\\) = "));
 
                     Integer in = Integer.parseInt(seq2.get(0));
@@ -78,6 +78,11 @@ public class InputDataUtil {
         }
         catch( IOException e){
             System.out.println("IO Exception");
+        }
+        System.out.println("util");
+        for(Sequence sequence: seq) {
+            List<Set<Integer>> dataSequence = sequence.getSequenceData();
+            System.out.println(dataSequence);
         }
 
         Data data = new Data(seq,mis,sdc);
