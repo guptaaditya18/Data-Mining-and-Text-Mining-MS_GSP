@@ -38,7 +38,9 @@ public class Activity {
 
     private static List<Sequence> getInput() {
         InputDataUtil input = new InputDataUtil();
-        return input.getDummyInput().getSequences();
+//        return input.getDummyInput().getSequences();
+
+        return input.parseTxt();
     }
 
 

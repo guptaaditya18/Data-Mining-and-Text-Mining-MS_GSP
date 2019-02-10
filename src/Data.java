@@ -1,8 +1,16 @@
+import java.util.HashMap;
 import java.util.List;
 
 public class Data {
     private List<Sequence> sequences;
-    private List<ItemDetail> itemDetails;
+    private HashMap<Integer,Double> itemMinSup;
+    private Double SDC;
+
+    public Data(List<Sequence> sequences, HashMap<Integer, Double> itemMinSup, Double SDC) {
+        this.sequences = sequences;
+        this.itemMinSup = itemMinSup;
+        this.SDC = SDC;
+    }
 
     public List<Sequence> getSequences() {
         return sequences;
@@ -12,11 +20,19 @@ public class Data {
         this.sequences = sequences;
     }
 
-    public List<ItemDetail> getItemDetails() {
-        return itemDetails;
+    public HashMap<Integer, Double> getItemMinSup() {
+        return itemMinSup;
     }
 
-    public void setItemDetails(List<ItemDetail> itemDetails) {
-        this.itemDetails = itemDetails;
+    public void setItemMinSup(HashMap<Integer, Double> itemMinSup) {
+        this.itemMinSup = itemMinSup;
+    }
+
+    public Double getSDC(){
+        return SDC;
+    }
+
+    public void setSDC(Double SDC){
+        this.SDC = SDC;
     }
 }
