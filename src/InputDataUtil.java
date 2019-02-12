@@ -50,7 +50,7 @@ public class InputDataUtil {
             System.out.println("IO Exception");
         }
 
-        HashMap<Integer, Double> mis = new HashMap<>();
+        HashMap<Integer, Double> mis = new LinkedHashMap<>();
         Double sdc = 0.0;
         try{
             BufferedReader br = new BufferedReader(new FileReader("Data/src/mis.txt"));
@@ -79,11 +79,8 @@ public class InputDataUtil {
         catch( IOException e){
             System.out.println("IO Exception");
         }
-        System.out.println("util");
-        for(Sequence sequence: seq) {
-            List<Set<Integer>> dataSequence = sequence.getSequenceData();
-            System.out.println(dataSequence);
-        }
+
+
 
         Data data = new Data(seq,mis,sdc);
 

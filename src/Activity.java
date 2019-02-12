@@ -6,9 +6,6 @@ import java.util.Set;
 public class Activity {
     public static void main(String[] args) throws IOException{
         Data inputSequence=getInput();
-        //Util.printSequence(inputSequence.getSequences());
-        //execute(inputSequence);
-        List<Sequence> outpuSequence=getOutput();
         System.out.println("");
         MSGSPAlgo algo=new MSGSPAlgo();
 
