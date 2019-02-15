@@ -28,7 +28,7 @@ public class InputDataUtil {
 
                 for (int i = 0; i < len2; i++) {
                     List<String> items = Arrays.asList(seq2.get(i).split(", "));
-                    Set<Integer> set1=new HashSet<>();
+                    Set<Integer> set1=new LinkedHashSet<>();
 
                     int len3 = items.size();
                     for(int j = 0; j < len3; j++){
