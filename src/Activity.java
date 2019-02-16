@@ -18,6 +18,7 @@ public class Activity {
 
     }
 
+
     private static List<Sequence> getOutput() {
         return new ArrayList<>();
     }
