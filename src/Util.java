@@ -61,10 +61,92 @@ public class Util {
         }
         return candidateSequenceMap;
     }
+    public static int getItemFromSequenceAtIndex(Sequence sequence, Index_of_Retrieval index){
 
+        List<Set<Integer>> seq=sequence.getSequenceData();
+        switch (index){
+            case LAST:
+                Set<Integer> lastset = seq.get(seq.size()-1);
+                Iterator<Integer> it2 = lastset.iterator();
+                int lastElement = 0;
+                while(it2.hasNext()){
+                    lastElement = it2.next();
+                }
+                return lastElement;
+            case FIRST:
+                return seq.get(0).iterator().next();
+                default: return 0;
+
+        }
+    }
+    public static List<List<Integer>> removeItemFromIndex(Sequence sequence,Index_of_Retrieval index){
+
+        List<List<Integer>> seqDash = Util.setToList(sequence.getSequenceData());
+        switch (index){
+            case LAST:
+                if(seqDash.get(seqDash.size()-1).size() == 1){
+                    seqDash.remove(seqDash.size()-1);
+                }else{
+                    seqDash.get(seqDash.size()-1).remove((seqDash.get(seqDash.size()-1).size())-1);
+                }
+                return seqDash;
+            case FIRST:
+                if(seqDash.get(0).size()>1){
+                    seqDash.get(0).remove(0);
+                }else{
+                    seqDash.remove(0);
+                }
+                return seqDash;
+            case SECOND:
+                if(seqDash.get(0).size() > 1)
+                    seqDash.get(0).remove(1);
+                else if (seqDash.get(1).size() == 1)
+                    seqDash.remove(1);
+                return seqDash;
+            case SECOND_LAST:
+                if(seqDash.get(sequence.getSequenceData().size()-1).size() > 1)
+                    seqDash.get(seqDash.size()-1).remove((seqDash.get(seqDash.size()-1).size())-2);
+                else if(seqDash.get(seqDash.size() - 2).size() == 1)
+                    seqDash.remove((seqDash.size()) - 2);
+                else{
+                    seqDash.get(seqDash.size()-2).remove(seqDash.get(seqDash.size()-2).size()-2);
+                }
+            default: return seqDash;
+
+        }
+
+    }
+
+//    public static boolean isFirstElementSmallerThanRest(Sequence sequence){
+//        boolean firstElementSmallerThanRestCondition=true;
+//        Double minsupFirstS1 = minSupItems.get(getItemFromSequenceAtIndex(sequence,Index_of_Retrieval.FIRST));
+//        for(Set<Integer> setFromS1:s1){
+//            for(int itemsFromS1:setFromS1){
+//                if(!flag){
+//                    flag = true;
+//                    continue;
+//                }
+//                if(minsupFirstS1 >= minSupItems.get(itemsFromS1))
+//                    firstElementSmallerThanRestCondition=false;
+//            }
+//        }
+//        return firstElementSmallerThanRestCondition;
+//    }
+    private static List<Integer> convertSetListToIntegerList(List<Set<Integer>> sequenceList){
+        List<Integer> list=new ArrayList<>();
+        for(Set<Integer> sets:sequenceList){
+            list.addAll(sets);
+        }
+        return list;
+
+    }
     private static boolean isFirstSubsetOfSecond(List<Set<Integer>> candidateSequence, List<Set<Integer>> dataSequence) {
 
         int j=0;
+        List<Integer> candidateList =convertSetListToIntegerList(candidateSequence);
+        List<Integer> dataList =convertSetListToIntegerList(dataSequence);
+
+
         for(int i=0;i<dataSequence.size() && j<candidateSequence.size();i++){
             if(dataSequence.get(i).containsAll(candidateSequence.get(j))){
                 j++;

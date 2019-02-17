@@ -38,7 +38,7 @@ public class MSGSPAlgo {
                 //Util.printSequence(c2Generation);
                 candidateCountMap = Util.getcandidateCount(c2Generation, data);
             }
-            else{
+            else if(k==2){
 
                 List<Sequence> CkGeneration = MScandidate_gen_SPM(new LinkedList<>(resultSeq.get(k-1).keySet()), new HashMap<>(sortedItemMinSup), tot, k-1);
                 candidateCountMap = Util.getcandidateCount(CkGeneration, data);
@@ -183,37 +183,47 @@ public class MSGSPAlgo {
 
                     int len = 0;
                     //find len of s2 - (change to 'k-1')
-                    for(Set<Integer> setFromS2:s2){
+                    /*for(Set<Integer> setFromS2:s2){
                         for(int itemsFromS2:setFromS2)
                             len++;
-                    }
+                    }*/
 
                     //check if minsup of last element of s2 is least
                     int count = 0;
                     for(Set<Integer> setFromS2:s2){
                         for(int itemsFromS2:setFromS2){
-                            if(count == len-2)
+                            count++;
+                            if(count == k-2)
                                 continue;
                             if(minSupItems.get(lastElementFromS2)>=minSupItems.get(itemsFromS2)){
                                 LastElementSmallerThanRestCondition=false;
-                                count++;
+
                             }
                         }
                     }
 
                     //Join part
                     if(firstElementSmallerThanRestCondition){
-                        ck.addAll(joinPartOne(s1, s2, firstElementFromS1 , minsupFirstS1, lastElementFromS2 ,minsupLastS2, minSupItems, k));
+
+                        if(checkEqualFunc1(s1,s2)) {
+                            ck.addAll(joinPartOne(s1, s2, firstElementFromS1, minsupFirstS1, lastElementFromS2, minsupLastS2, minSupItems, k));
+                        }
                     }else if(LastElementSmallerThanRestCondition){
-                        ck.addAll(joinPartTwo(s1, s2, firstElementFromS1 , minsupFirstS1, firstElementFromS2 ,minsupLastS2, minSupItems, k));
+
+                        if(checkEqualFunc2(s1, s2)){
+                            ck.addAll(joinPartTwo(s1, s2, firstElementFromS1 , minsupFirstS1, firstElementFromS2 ,minsupLastS2, minSupItems, k));
+                        }
+
                     }else{
 
                         if(checkEqualFunc3(s1, s2)){
+                            System.out.println("Success");
+                            ck.addAll(joinPartOne(s1, s2, firstElementFromS1, minsupFirstS1, lastElementFromS2, minsupLastS2, minSupItems, k));
 
                         }else if(checkEqualFunc4(s1, s2)){
+                            ck.addAll(joinPartTwo(s1, s2, firstElementFromS1 , minsupFirstS1, firstElementFromS2 ,minsupLastS2, minSupItems, k));
 
                         }
-//                        ck.add(joinPartThree(s1,s2));
                     }
 
                     //prune part
@@ -227,7 +237,7 @@ public class MSGSPAlgo {
 
 
         }
-
+    //associated with joinpart2
     private boolean checkEqualFunc4(List<Set<Integer>> s1, List<Set<Integer>> s2) {
         //Copy s1 and s2 to list s1Dash and s2Dash
         List<List<Integer>> s1Dash = Util.setToList(s1);
@@ -255,10 +265,14 @@ public class MSGSPAlgo {
 
     }
 
+    //associated with join part1
     private boolean checkEqualFunc3(List<Set<Integer>> s1, List<Set<Integer>> s2) {
+        System.out.println("yes");
         //Copy s1 and s2 to list s1Dash and s2Dash
         List<List<Integer>> s1Dash = Util.setToList(s1);
         List<List<Integer>> s2Dash = Util.setToList(s2);
+        System.out.println(s1+"\t"+s2 +" Before removal");
+
 
         //remove 1st from s1
         if(s1Dash.get(0).size()>1){
@@ -273,6 +287,7 @@ public class MSGSPAlgo {
         }else{
             s2Dash.get(s2Dash.size()-1).remove((s2Dash.get(s2Dash.size()-1).size())-1);
         }
+        System.out.println(s1Dash+"\t"+s2Dash +" After removal");
 
         if(s1Dash.equals(s2Dash))
             return true;
@@ -289,7 +304,6 @@ public class MSGSPAlgo {
             if(minsupLastS2 > minsupFirstS1)
                 MSLastS2MSFirstS1 = true;
 
-            boolean checkEqual1 = checkEqualFunc1(s1, s2);
 
             //find last item of s1, used multiple times below
             Iterator<Integer> it = s1.get(s1.size()-1).iterator();
@@ -298,7 +312,7 @@ public class MSGSPAlgo {
                 lastElementFromS1 = it.next();
             }
 
-            if(checkEqual1 && MSLastS2MSFirstS1){
+            if(minsupLastS2 > minsupFirstS1){
 
                 //if the last item l in s2 is a separate element then
                 if(s2.get(s2.size()-1).size() == 1){
@@ -381,11 +395,7 @@ public class MSGSPAlgo {
 
             List<Sequence> cklocal = new ArrayList<Sequence>();
             boolean MSLastS2MSFirstS1 = false;
-            boolean checkEqual = checkEqualFunc2(s1, s2);
 
-            //MIS value of the first item of s1 is greater than that of the last item of s2.
-            if(minsupLastS2 <= minsupFirstS1)
-                MSLastS2MSFirstS1 = true;
 
             //find last item of s1, used multiple times below
             Iterator<Integer> it = s1.get(s1.size()-1).iterator();
@@ -394,7 +404,8 @@ public class MSGSPAlgo {
                 lastElementFromS1 = it.next();
 
             //Candidate sequences are generated by prepending first item of s1 with s2
-            if(checkEqual && MSLastS2MSFirstS1){
+            //MIS value of the first item of s1 is greater than that of the last item of s2.
+            if(minsupLastS2 <= minsupFirstS1){
 
                 //if the first item l in s1 is a separate element then
                 if(s1.get(0).size() == 1){
@@ -494,12 +505,6 @@ public class MSGSPAlgo {
 
 
 
-
-
-
-
-
-
     private HashMap<Sequence,Integer> getFirstLevelSeq(Set<Integer> lvalues, HashMap<Integer, Integer> itemCountMap, HashMap<Integer, Double> sortedItemMinSup,int tot) {
         HashMap<Sequence,Integer> F1Values=new LinkedHashMap<>();
 
@@ -572,13 +577,13 @@ public class MSGSPAlgo {
                         F2Values.add(new Sequence(l2SetList));
 
 
-//                        //adding elements of tupe:<{y},{x}>
-//                        List<Set<Integer>> l3SetList=new ArrayList();
-//                        l3SetList.add(secondElementSet);
-//                        l3SetList.add(firstElementSet);
-//                        F2Values.add(new Sequence(l3SetList));
-//
-//
+                        //adding elements of tupe:<{y},{x}>
+                        List<Set<Integer>> l3SetList=new ArrayList();
+                        l3SetList.add(secondElementSet);
+                        l3SetList.add(firstElementSet);
+                        F2Values.add(new Sequence(l3SetList));
+
+
 //                        //adding elements of type: <{x}{x}>
 //                        List<Set<Integer>> l4SetList=new ArrayList();
 //                        l4SetList.add(firstElementSet);
