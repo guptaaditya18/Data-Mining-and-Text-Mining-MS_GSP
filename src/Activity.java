@@ -8,7 +8,6 @@ public class Activity {
         Data inputSequence=getInput();
         System.out.println("");
         MSGSPAlgo algo=new MSGSPAlgo();
-
         algo.getFinalSequence(inputSequence);
 
     }

@@ -1,47 +1,68 @@
-import com.sun.jdi.connect.spi.TransportService;
-
 import java.util.*;
 
 public class MSGSPAlgo {
 
     public void getFinalSequence(Data data){
         List<HashMap<Sequence,Integer>> resultSeq=new ArrayList<>();
-        Util.printSequence(data.getSequences());
+        //Util.printSequence(data.getSequences());
         int tot=data.getSequences().size();
 
-       // System.out.println(tot);
+
+        System.out.println(tot);
 
         //Sort acc to MIS:
-        TreeMap<Integer, Double> sortedItemMinSup = getSortedMapByvalue(data.getItemMinSup());
+        TreeMap<Integer, Double> sortedItemMinSup = Util.getSortedMapByvalue(data.getItemMinSup());
 
 
-//        System.out.println("Sorted item min sup:");
-//        System.out.println(sortedItemMinSup);
+        System.out.println("Sorted item min sup:");
+        System.out.println(sortedItemMinSup);
 
-        HashMap<Integer, Integer> itemCountMap = getItemCountMap(data);
-//        System.out.println("item count map");
-//        System.out.println(itemCountMap);
+        HashMap<Integer, Integer> itemCountMap = Util.getItemCountMap(data,data.getItemMinSup());
+        System.out.println("item count map");
+        System.out.println(itemCountMap);
 
         Set<Integer> lvalues=getLvalues(new HashMap<>(sortedItemMinSup),data,itemCountMap,tot);
 
 
         HashMap<Sequence,Integer> c1 = getFirstLevelSeq(lvalues, itemCountMap, new HashMap<>(sortedItemMinSup), tot);
-        System.out.println("length 1 total number :"+c1.size());
-        Util.printSequence(c1);
+        //System.out.println("length 1 total number :"+c1.size());
+        //Util.printSequence(c1);
         resultSeq.add(c1);
+        int k=1;
 
-        List<Sequence> c2Generation = getSecondLevelSequence(new HashMap<>(sortedItemMinSup), itemCountMap, lvalues, tot, data.getSDC());
-        //Util.printSequence(c2Generation);
-        System.out.println(c2Generation.size());
+        while(!resultSeq.get(k-1).isEmpty()){
 
-        HashMap<Sequence, Integer> c2 = getcandidateCount(c2Generation, data);
+            HashMap<Sequence, Integer> candidateCountMap = new HashMap<>();
+            if(k==1){
+                List<Sequence> c2Generation = getSecondLevelSequence(new HashMap<>(sortedItemMinSup), itemCountMap, lvalues, tot, data.getSDC());
+                //Util.printSequence(c2Generation);
+                candidateCountMap = Util.getcandidateCount(c2Generation, data);
+            }
+            else{
 
-        HashMap<Sequence,Integer> f2=new LinkedHashMap<>();
-        //Util.printSequence(c2);
-        System.out.println(c2.size());
-/*
+                List<Sequence> CkGeneration = MScandidate_gen_SPM(new LinkedList<>(resultSeq.get(k-1).keySet()), new HashMap<>(sortedItemMinSup), tot, k-1);
+                candidateCountMap = Util.getcandidateCount(CkGeneration, data);
+            }
 
-        // Testing Subset Function.
+
+            HashMap<Sequence, Integer> Fk = Util.convertCandidatesToFinalSequence(candidateCountMap, data, tot);
+
+            resultSeq.add(Fk);
+            System.out.println("count of Sequence of length : "+k+ " is: "+resultSeq.get(k-1).size());
+            Util.printSequence(resultSeq.get(k-1));
+            k++;
+        }
+
+//        List<Sequence> c2Generation = getSecondLevelSequence(new HashMap<>(sortedItemMinSup), itemCountMap, lvalues, tot, data.getSDC());
+//        HashMap<Sequence, Integer> c2 = getcandidateCount(c2Generation, data);
+//
+//
+//        //Util.printSequence(c2);
+//        System.out.println(c2.size());
+//
+
+
+        /*// Testing Subset Function.
         Set<Integer> testSet=new LinkedHashSet<>(Arrays.asList(7,19));
         List<Set<Integer>> testList=new ArrayList<>();
         testList.add(testSet);
@@ -62,77 +83,61 @@ public class MSGSPAlgo {
 
 
         }
+        */
 
 
-*/
-
-
-
-        //line 17 from MS-GSP page:46
-
-        for(Map.Entry<Sequence,Integer> entry:c2.entrySet()){
-            double min=-1;
-            boolean flag=false;
-            for(Set<Integer> sets: entry.getKey().getSequenceData()){
-                min=getMinMisValue(entry.getKey(),data.getItemMinSup());
-                double count=(double)entry.getValue();
-                if(count/tot>=min) {
-                    flag=true;
-                }
-            }
-            if(flag) {
-                f2.put(new Sequence(entry.getKey().getSequenceData()), entry.getValue());
-            }
-        }
-
-        resultSeq.add(f2);
-        System.out.println("\n length 2 total number :"+f2.size());
-        //Util.printSequence(f2);
-
-
-        int k = 3;
-
-//        int k = 3;
-//        List<Sequence> Ck = new ArrayList<Sequence>();
-//        Ck =  MScandidate_gen_SPM(new LinkedList<>(f2.keySet()), new HashMap<>(sortedItemMinSup), tot, k);
-//        System.out.println("cksize"+Ck.size());
-//        HashMap<Sequence, Integer> c2count = getcandidateCount(Ck, data);
-//        System.out.println(c2count.size());
-//        Util.printSequence(c2count);
-
-
-        List<Sequence> Ck = MScandidate_gen_SPM(new LinkedList<>(f2.keySet()), new HashMap<>(sortedItemMinSup), tot, k);
-//        System.out.println("cksize"+Ck.size());
-        HashMap<Sequence, Integer> c3count = getcandidateCount(Ck, data);
-//        System.out.println(c3count.size());
-//        Util.printSequence(c3count);
-
-        HashMap<Sequence,Integer> f3=new LinkedHashMap<>();
-        //Util.printSequence(c2);
-        //System.out.println(c2.size());
-        //line 17 from MS-GSP page:46
-
-        for(Map.Entry<Sequence,Integer> entry:c3count.entrySet()){
-            double min=-1;
-            boolean flag=false;
-            for(Set<Integer> sets: entry.getKey().getSequenceData()){
-                min=getMinMisValue(entry.getKey(),data.getItemMinSup());
-                double count=(double)entry.getValue();
-                if(count/tot>=min) {
-                    flag=true;
-                }
-            }
-            if(flag) {
-                f3.put(new Sequence(entry.getKey().getSequenceData()), entry.getValue());
-            }
-        }
-
-        resultSeq.add(f3);
-        System.out.println("\n length 3 total number :"+f3.size());
-        Util.printSequence(f3);
-
+//        //line 17 from MS-GSP page:46
+////
+//
+//        System.out.println("\n length 2 total number :"+f2.size());
+//        //Util.printSequence(f2);
+//
+//
+//        //int k = 3;
+//
+////        int k = 3;
+////        List<Sequence> Ck = new ArrayList<Sequence>();
+////        Ck =  MScandidate_gen_SPM(new LinkedList<>(f2.keySet()), new HashMap<>(sortedItemMinSup), tot, k);
+////        System.out.println("cksize"+Ck.size());
+////        HashMap<Sequence, Integer> c2count = getcandidateCount(Ck, data);
+////        System.out.println(c2count.size());
+////        Util.printSequence(c2count);
+//
+//
+//        List<Sequence> Ck = MScandidate_gen_SPM(new LinkedList<>(f2.keySet()), new HashMap<>(sortedItemMinSup), tot, k);
+////        System.out.println("cksize"+Ck.size());
+//        HashMap<Sequence, Integer> c3count = getcandidateCount(Ck, data);
+////        System.out.println(c3count.size());
+////        Util.printSequence(c3count);
+//
+//        HashMap<Sequence,Integer> f3=new LinkedHashMap<>();
+//        //Util.printSequence(c2);
+//        //System.out.println(c2.size());
+//        //line 17 from MS-GSP page:46
+//
+//        for(Map.Entry<Sequence,Integer> entry:c3count.entrySet()){
+//            double min=-1;
+//            boolean flag=false;
+//            for(Set<Integer> sets: entry.getKey().getSequenceData()){
+//                min=Util.getMinMisValue(entry.getKey(),data.getItemMinSup());
+//                double count=(double)entry.getValue();
+//                if(count/tot>=min) {
+//                    flag=true;
+//                }
+//            }
+//            if(flag) {
+//                f3.put(new Sequence(entry.getKey().getSequenceData()), entry.getValue());
+//            }
+//        }
+//
+//        resultSeq.add(f3);
+//        System.out.println("\n length 3 total number :"+f3.size());
+//        Util.printSequence(f3);
+//
 
     }
+
+
 
     //Aditya Gupta
 
@@ -489,59 +494,11 @@ public class MSGSPAlgo {
 
 
 
-    private double getMinMisValue(Sequence sequence, HashMap<Integer, Double> itemMinSup) {
-        double min= Integer.MAX_VALUE;
-
-            for(Set<Integer> itemset: sequence.getSequenceData()){
-                for(Integer item:itemset){
-                    try {
-                        if (itemMinSup.get(item) < min) {
-                            min = itemMinSup.get(item);
-                        }
-                    }catch (NullPointerException ne){
-                        System.out.println("item not found: "+item);
-                    }
-
-            }
-        }
-        return min;
-
-    }
-
-    private HashMap<Sequence,Integer> getcandidateCount(List<Sequence> c2, Data data) {
-        HashMap<Sequence,Integer> candidateSequenceMap=new LinkedHashMap<>();
-
-        for(Sequence sequence: data.getSequences()){
-
-            List<Set<Integer>> dataSequence = sequence.getSequenceData();
-            //System.out.print("data sequence:"+dataSequence);
-            for(Sequence candidateSequence:c2){
-                //System.out.print("\t candidate sequence:"+candidateSequence.getSequenceData());
-                if(isFirstSubsetOfSecond(candidateSequence.getSequenceData(),dataSequence)){
-
-                    candidateSequenceMap.put(candidateSequence,candidateSequenceMap.getOrDefault(candidateSequence,0)+1);
-                }
 
 
-            }
-        }
-        return candidateSequenceMap;
-    }
 
-    private boolean isFirstSubsetOfSecond(List<Set<Integer>> candidateSequence, List<Set<Integer>> dataSequence) {
 
-        int j=0;
-        for(int i=0;i<dataSequence.size() && j<candidateSequence.size();i++){
-                if(dataSequence.get(i).containsAll(candidateSequence.get(j))){
-                    j++;
-                }
-        }
-        if(j==candidateSequence.size()){
-                return true;
-        }
 
-        return false;
-    }
 
     private HashMap<Sequence,Integer> getFirstLevelSeq(Set<Integer> lvalues, HashMap<Integer, Integer> itemCountMap, HashMap<Integer, Double> sortedItemMinSup,int tot) {
         HashMap<Sequence,Integer> F1Values=new LinkedHashMap<>();
@@ -557,18 +514,6 @@ public class MSGSPAlgo {
             }
         }
         return F1Values;
-    }
-
-    private TreeMap<Integer, Double> getSortedMapByvalue(HashMap<Integer, Double> itemMinSup) {
-        Comparator<Integer> valueComparator =  new Comparator<Integer>() {
-            public int compare(Integer k1, Integer k2) {
-
-                return (itemMinSup.get(k1)>itemMinSup.get(k2)?1:-1);
-            }
-        };
-        TreeMap<Integer,Double> map=new TreeMap<>(valueComparator);
-        map.putAll(itemMinSup);
-        return map;
     }
 
     private Set<Integer> getLvalues(HashMap<Integer, Double> minSupItems, Data data, HashMap<Integer, Integer> itemCountMap,int tot) {
@@ -590,44 +535,55 @@ public class MSGSPAlgo {
     }
 
     private List<Sequence> getSecondLevelSequence(HashMap<Integer, Double> minSupItems, HashMap<Integer, Integer> itemCountMap, Set<Integer> lvalues, int tot, Double sdc) {
-        List<Sequence> F2Values=new ArrayList<>();
+        List<Sequence> F2Values = new ArrayList<>();
 
-        List<Integer> lvalueList=new ArrayList(lvalues);
-        System.out.println(lvalueList);
-//        System.out.println(itemCountMap);
-//        System.out.println(minSupItems);
+        List<Integer> lvalueList = new ArrayList(lvalues);
 
-        for(int i=0;i<lvalueList.size();i++){
+        for (int i = 0; i < lvalueList.size(); i++) {
 
-            int elementI=lvalueList.get(i);
-            double countFirst=(double)itemCountMap.get(elementI);
+            int elementI = lvalueList.get(i);
+            double firstSup = (double) itemCountMap.get(elementI) / (double) tot;
 
-            if(countFirst/tot >= minSupItems.get(elementI)){
-                for(int j=0;j<lvalueList.size();j++){
-                    int elementJ=lvalueList.get(j);
-                    double countSecond=(double)itemCountMap.get(elementJ);
-                    if(countSecond/tot >=minSupItems.get(elementI) && Math.abs(minSupItems.get(elementJ)-minSupItems.get(elementI))<=sdc){
+            if (firstSup >= minSupItems.get(elementI)) {
+                for (int j = 0; j < lvalueList.size(); j++) {
+                    int elementJ = lvalueList.get(j);
+                    double secondSup = (double) itemCountMap.get(elementJ) / (double) tot;
+
+                    if (secondSup >= minSupItems.get(elementI)
+                            && Math.abs(secondSup - firstSup) <= sdc) {
+
 
                         //adding elements of type: <{x,y}>
-                        List<Set<Integer>> l1SetList = new ArrayList();
-                        if(elementI!=elementJ && i<j) {
+                        if (elementI != elementJ) {
+                            List<Set<Integer>> l1SetList = new ArrayList();
                             l1SetList.add(new LinkedHashSet<>(Arrays.asList(elementI, elementJ)));
-
                             F2Values.add(new Sequence(l1SetList));
                         }
 
                         //adding elements of type: <{x},{y}>
-                        Set<Integer> firstElementSet=new LinkedHashSet<>();
+                        Set<Integer> firstElementSet = new LinkedHashSet<>();
                         firstElementSet.add(elementI);
-                        Set<Integer> secondElementSet=new LinkedHashSet<>();
+                        Set<Integer> secondElementSet = new LinkedHashSet<>();
                         secondElementSet.add(elementJ);
 
-                        List<Set<Integer>> l2SetList=new ArrayList();
+                        List<Set<Integer>> l2SetList = new ArrayList();
                         l2SetList.add(firstElementSet);
                         l2SetList.add(secondElementSet);
-
-
                         F2Values.add(new Sequence(l2SetList));
+
+
+//                        //adding elements of tupe:<{y},{x}>
+//                        List<Set<Integer>> l3SetList=new ArrayList();
+//                        l3SetList.add(secondElementSet);
+//                        l3SetList.add(firstElementSet);
+//                        F2Values.add(new Sequence(l3SetList));
+//
+//
+//                        //adding elements of type: <{x}{x}>
+//                        List<Set<Integer>> l4SetList=new ArrayList();
+//                        l4SetList.add(firstElementSet);
+//                        l4SetList.add(firstElementSet);
+//                        F2Values.add(new Sequence(l4SetList));
 
 
                     }
@@ -635,24 +591,9 @@ public class MSGSPAlgo {
                 }
             }
         }
-        return F2Values;
+        return Util.removeDuplicates(F2Values);
+    }
 
 
-    }
-    private HashMap<Integer,Integer> getItemCountMap(Data data){
-        HashMap<Integer, Integer> itemCountSeq = new HashMap<>();
-        for (Sequence s : data.getSequences()) {
-            HashMap<Integer, Integer> itemCountSet = new HashMap<>();
-            for (Set<Integer> sets : s.getSequenceData()) {
-                for (int i : sets) {
-                    itemCountSet.put(i, 1);
-                }
-            }
-            for (Map.Entry<Integer, Integer> entry : itemCountSet.entrySet()) {
-                itemCountSeq.put(entry.getKey(), itemCountSeq.getOrDefault(entry.getKey(), 0) + 1);
-            }
-        }
-        return itemCountSeq;
-    }
 
 }
