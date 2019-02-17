@@ -32,11 +32,42 @@ public class MSGSPAlgo {
 
         List<Sequence> c2Generation = getSecondLevelSequence(new HashMap<>(sortedItemMinSup), itemCountMap, lvalues, tot, data.getSDC());
         //Util.printSequence(c2Generation);
-        //System.out.println(c2Generation.size());
+        System.out.println(c2Generation.size());
+
         HashMap<Sequence, Integer> c2 = getcandidateCount(c2Generation, data);
+
         HashMap<Sequence,Integer> f2=new LinkedHashMap<>();
         //Util.printSequence(c2);
-        //System.out.println(c2.size());
+        System.out.println(c2.size());
+/*
+
+        // Testing Subset Function.
+        Set<Integer> testSet=new LinkedHashSet<>(Arrays.asList(7,19));
+        List<Set<Integer>> testList=new ArrayList<>();
+        testList.add(testSet);
+
+
+        System.out.println();
+        for(Sequence sequence: data.getSequences()){
+
+            List<Set<Integer>> dataSequence = sequence.getSequenceData();
+            //System.out.print("data sequence:"+dataSequence);
+
+                //System.out.print("\t candidate sequence:"+candidateSequence.getSequenceData());
+                if(isFirstSubsetOfSecond(testList,dataSequence)){
+
+                    System.out.println("Yo man"+dataSequence);
+                }
+
+
+
+        }
+
+
+*/
+
+
+
         //line 17 from MS-GSP page:46
 
         for(Map.Entry<Sequence,Integer> entry:c2.entrySet()){
@@ -56,9 +87,19 @@ public class MSGSPAlgo {
 
         resultSeq.add(f2);
         System.out.println("\n length 2 total number :"+f2.size());
-        Util.printSequence(f2);
+        //Util.printSequence(f2);
+
 
         int k = 3;
+
+//        int k = 3;
+//        List<Sequence> Ck = new ArrayList<Sequence>();
+//        Ck =  MScandidate_gen_SPM(new LinkedList<>(f2.keySet()), new HashMap<>(sortedItemMinSup), tot, k);
+//        System.out.println("cksize"+Ck.size());
+//        HashMap<Sequence, Integer> c2count = getcandidateCount(Ck, data);
+//        System.out.println(c2count.size());
+//        Util.printSequence(c2count);
+
 
         List<Sequence> Ck = MScandidate_gen_SPM(new LinkedList<>(f2.keySet()), new HashMap<>(sortedItemMinSup), tot, k);
 //        System.out.println("cksize"+Ck.size());
@@ -552,7 +593,7 @@ public class MSGSPAlgo {
         List<Sequence> F2Values=new ArrayList<>();
 
         List<Integer> lvalueList=new ArrayList(lvalues);
-//        System.out.println(lvalueList);
+        System.out.println(lvalueList);
 //        System.out.println(itemCountMap);
 //        System.out.println(minSupItems);
 
@@ -562,14 +603,18 @@ public class MSGSPAlgo {
             double countFirst=(double)itemCountMap.get(elementI);
 
             if(countFirst/tot >= minSupItems.get(elementI)){
-                for(int j=i+1;j<lvalueList.size();j++){
+                for(int j=0;j<lvalueList.size();j++){
                     int elementJ=lvalueList.get(j);
                     double countSecond=(double)itemCountMap.get(elementJ);
                     if(countSecond/tot >=minSupItems.get(elementI) && Math.abs(minSupItems.get(elementJ)-minSupItems.get(elementI))<=sdc){
 
                         //adding elements of type: <{x,y}>
-                        List<Set<Integer>> l1SetList=new ArrayList();
-                        l1SetList.add(new LinkedHashSet<>(Arrays.asList(elementI, elementJ)));
+                        List<Set<Integer>> l1SetList = new ArrayList();
+                        if(elementI!=elementJ && i<j) {
+                            l1SetList.add(new LinkedHashSet<>(Arrays.asList(elementI, elementJ)));
+
+                            F2Values.add(new Sequence(l1SetList));
+                        }
 
                         //adding elements of type: <{x},{y}>
                         Set<Integer> firstElementSet=new LinkedHashSet<>();
@@ -581,14 +626,10 @@ public class MSGSPAlgo {
                         l2SetList.add(firstElementSet);
                         l2SetList.add(secondElementSet);
 
-                        F2Values.add(new Sequence(l1SetList));
+
                         F2Values.add(new Sequence(l2SetList));
 
-                        //adding elements of type: <{y},{x}>
-                        List<Set<Integer>> l3SetList=new ArrayList();
-                        l3SetList.add(secondElementSet);
-                        l3SetList.add(firstElementSet);
-                        F2Values.add(new Sequence(l3SetList));
+
                     }
 
                 }
