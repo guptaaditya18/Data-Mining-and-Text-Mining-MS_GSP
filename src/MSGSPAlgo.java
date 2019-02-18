@@ -156,6 +156,9 @@ public class MSGSPAlgo {
                     int firstElementFromS1=s1.get(0).iterator().next();
                     int firstElementFromS2=s2.get(0).iterator().next();
 
+//                    System.out.print(s1+"\t"+firstElementFromS1);
+//                    System.out.println(s2+"\t"+firstElementFromS2);
+
                     //anoop - check if minsup of first element of s1 is less than the rest of the elements
                     boolean flag = false;
                     Double minsupFirstS1 = minSupItems.get(firstElementFromS1);
@@ -164,8 +167,7 @@ public class MSGSPAlgo {
                             if(!flag){
                                 flag = true;
                                 continue;
-                            }
-                            if(minsupFirstS1 >= minSupItems.get(itemsFromS1))
+                            }else if(minsupFirstS1 >= minSupItems.get(itemsFromS1))
                                 firstElementSmallerThanRestCondition=false;
                         }
                     }
@@ -189,38 +191,48 @@ public class MSGSPAlgo {
                     }*/
 
                     //check if minsup of last element of s2 is least
-                    int count = 0;
-                    for(Set<Integer> setFromS2:s2){
-                        for(int itemsFromS2:setFromS2){
-                            count++;
-                            if(count == k-2)
-                                continue;
-                            if(minSupItems.get(lastElementFromS2)>=minSupItems.get(itemsFromS2)){
-                                LastElementSmallerThanRestCondition=false;
+//                    int count = 0;
+                    //double leastMinsup=s2.get(0).iterator().next();
 
-                            }
-                        }
-                    }
+//                    for(Set<Integer> setFromS2:s2){
+//                        for(int itemsFromS2:setFromS2){
+//                            count++;
+//                            if(count == k)
+//                                continue;
+//                            if(minsupLastS2 >= minSupItems.get(itemsFromS2)){
+//
+//                                System.out.println(minSupItems.get(lastElementFromS2)+"\t"+itemsFromS2+"LastElementSmallerThanRestCondition=false \t\t"+s1+"\t"+s2);
+//                                LastElementSmallerThanRestCondition=false;
+//
+//
+//                            }
+//                        }
+//                    }
+                    LastElementSmallerThanRestCondition=(lastElementFromS2==Util.getItemWithLeastMisValue(f2.get(j),minSupItems))?true:false;
+//                    firstElementSmallerThanRestCondition=(firstElementFromS1==Util.getItemWithLeastMisValue(f2.get(j),minSupItems))?true:false;
 
                     //Join part
                     if(firstElementSmallerThanRestCondition){
 
                         if(checkEqualFunc1(s1,s2)) {
+                            System.out.println("if 1\t"+s1+"\t"+s2);
                             ck.addAll(joinPartOne(s1, s2, firstElementFromS1, minsupFirstS1, lastElementFromS2, minsupLastS2, minSupItems, k));
                         }
                     }else if(LastElementSmallerThanRestCondition){
-
+                        System.out.println("if 2\t"+s1+"\t"+s2);
                         if(checkEqualFunc2(s1, s2)){
+
                             ck.addAll(joinPartTwo(s1, s2, firstElementFromS1 , minsupFirstS1, firstElementFromS2 ,minsupLastS2, minSupItems, k));
                         }
 
                     }else{
 
                         if(checkEqualFunc3(s1, s2)){
-                            System.out.println("Success");
+                            System.out.println("if 3\t"+s1+"\t"+s2);
                             ck.addAll(joinPartOne(s1, s2, firstElementFromS1, minsupFirstS1, lastElementFromS2, minsupLastS2, minSupItems, k));
 
                         }else if(checkEqualFunc4(s1, s2)){
+                            System.out.println("if 4\t"+s1+"\t"+s2);
                             ck.addAll(joinPartTwo(s1, s2, firstElementFromS1 , minsupFirstS1, firstElementFromS2 ,minsupLastS2, minSupItems, k));
 
                         }
@@ -231,82 +243,71 @@ public class MSGSPAlgo {
 
                 }
             }
-//            for (Sequence seqfromck:ck){
-//                System.out.println(seqfromck.sequenceData);
-//            }
             return ck;
 
 
         }
 
+        //associated with join part1
+        private boolean checkEqualFunc3(List<Set<Integer>> s1, List<Set<Integer>> s2) {
+            //Copy s1 and s2 to list s1Dash and s2Dash
+            List<List<Integer>> s1Dash = Util.setToList(s1);
+            List<List<Integer>> s2Dash = Util.setToList(s2);
 
-    //associated with joinpart2
-    private boolean checkEqualFunc4(List<Set<Integer>> s1, List<Set<Integer>> s2) {
-        //Copy s1 and s2 to list s1Dash and s2Dash
-        List<List<Integer>> s1Dash = Util.setToList(s1);
-        List<List<Integer>> s2Dash = Util.setToList(s2);
 
-        //remove last from s1
-        if(s1Dash.get(s1Dash.size()-1).size() == 1){
-            s1Dash.remove(s1Dash.size()-1);
-        }else{
-            s1Dash.get(s1Dash.size()-1).remove((s1Dash.get(s1Dash.size()-1).size())-1);
+            //remove 1st from s1
+            if(s1Dash.get(0).size()>1){
+                s1Dash.get(0).remove(0);
+            }else{
+                s1Dash.remove(0);
+            }
+
+            //remove last from s2
+            if(s2Dash.get(s2Dash.size()-1).size() == 1){
+                s2Dash.remove(s2Dash.size()-1);
+            }else{
+                s2Dash.get(s2Dash.size()-1).remove((s2Dash.get(s2Dash.size()-1).size())-1);
+            }
+
+            if(s1Dash.equals(s2Dash))
+                return true;
+
+            return false;
+
+        }
+
+        //associated with joinpart2
+        private boolean checkEqualFunc4(List<Set<Integer>> s1, List<Set<Integer>> s2) {
+            //Copy s1 and s2 to list s1Dash and s2Dash
+            List<List<Integer>> s1Dash = Util.setToList(s1);
+            List<List<Integer>> s2Dash = Util.setToList(s2);
+
+            //remove last from s1
+            if(s1Dash.get(s1Dash.size()-1).size() == 1){
+                s1Dash.remove(s1Dash.size()-1);
+            }else{
+                s1Dash.get(s1Dash.size()-1).remove((s1Dash.get(s1Dash.size()-1).size())-1);
+            }
+
+
+            //remove 1st from s2
+            if(s2Dash.get(0).size()>1){
+                s2Dash.get(0).remove(0);
+            }else{
+                s2Dash.remove(0);
+            }
+
+            if(s1Dash.equals(s2Dash))
+                return true;
+
+            return false;
+
         }
 
 
-        //remove 1st from s2
-        if(s2Dash.get(0).size()>1){
-            s2Dash.get(0).remove(0);
-        }else{
-            s2Dash.remove(0);
-        }
 
-        if(s1Dash.equals(s2Dash))
-            return true;
-
-        return false;
-
-    }
-
-    //associated with join part1
-    private boolean checkEqualFunc3(List<Set<Integer>> s1, List<Set<Integer>> s2) {
-        System.out.println("yes");
-        //Copy s1 and s2 to list s1Dash and s2Dash
-        List<List<Integer>> s1Dash = Util.setToList(s1);
-        List<List<Integer>> s2Dash = Util.setToList(s2);
-        System.out.println(s1+"\t"+s2 +" Before removal");
-
-
-        //remove 1st from s1
-        if(s1Dash.get(0).size()>1){
-            s1Dash.get(0).remove(0);
-        }else{
-            s1Dash.remove(0);
-        }
-
-        //remove last from s2
-        if(s2Dash.get(s2Dash.size()-1).size() == 1){
-            s2Dash.remove(s2Dash.size()-1);
-        }else{
-            s2Dash.get(s2Dash.size()-1).remove((s2Dash.get(s2Dash.size()-1).size())-1);
-        }
-        System.out.println(s1Dash+"\t"+s2Dash +" After removal");
-
-        if(s1Dash.equals(s2Dash))
-            return true;
-
-        return false;
-
-    }
-
-    private  List<Sequence> joinPartOne( List<Set<Integer>> s1, List<Set<Integer>> s2, int firstElementFromS1, Double minsupFirstS1, int lastElementFromS2, Double minsupLastS2, HashMap<Integer, Double> minSupItems, int k){
+        private  List<Sequence> joinPartOne( List<Set<Integer>> s1, List<Set<Integer>> s2, int firstElementFromS1, Double minsupFirstS1, int lastElementFromS2, Double minsupLastS2, HashMap<Integer, Double> minSupItems, int k){
             List<Sequence> cklocal = new ArrayList<Sequence>();
-
-            boolean MSLastS2MSFirstS1 = false;
-
-            if(minsupLastS2 > minsupFirstS1)
-                MSLastS2MSFirstS1 = true;
-
 
             //find last item of s1, used multiple times below
             Iterator<Integer> it = s1.get(s1.size()-1).iterator();
@@ -397,7 +398,6 @@ public class MSGSPAlgo {
         private  List<Sequence> joinPartTwo( List<Set<Integer>> s1, List<Set<Integer>> s2, int firstElementFromS1, Double minsupFirstS1, int firstElementFromS2, Double minsupLastS2, HashMap<Integer, Double> minSupItems, int k){
 
             List<Sequence> cklocal = new ArrayList<Sequence>();
-            boolean MSLastS2MSFirstS1 = false;
 
 
             //find last item of s1, used multiple times below

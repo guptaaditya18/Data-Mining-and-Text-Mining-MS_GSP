@@ -250,7 +250,7 @@ public class Util {
 
     public static  List<Sequence> getPrunedMSGSPCandidates(List<Sequence> ck, HashMap<Integer, Double> minSupItems, Data data) {
 
-        System.out.println("Pruning:");
+
         List<Sequence> unprunedSequences=new ArrayList<>();
         for(Sequence seq:ck){
             List<List<Integer>> seqCopy=Util.setToList(seq.getSequenceData());
