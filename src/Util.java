@@ -61,6 +61,7 @@ public class Util {
         }
         return candidateSequenceMap;
     }
+
     public static int getItemFromSequenceAtIndex(Sequence sequence, Index_of_Retrieval index){
 
         List<Set<Integer>> seq=sequence.getSequenceData();
@@ -225,5 +226,83 @@ public class Util {
             }
             System.out.println(">" + "\t"+ entry.getValue());
         }
+    }
+
+    public static int getItemWithLeastMisValue(Sequence seq, HashMap<Integer, Double> minSupItems) {
+        double min= Integer.MAX_VALUE;
+        int itemWithLowestMis=seq.getSequenceData().get(0).iterator().next();
+
+        for(Set<Integer> itemset: seq.getSequenceData()){
+            for(Integer item:itemset){
+                try {
+                    if (minSupItems.get(item) < min) {
+                        min = minSupItems.get(item);
+                        itemWithLowestMis=item;
+                    }
+                }catch (NullPointerException ne){
+                    System.out.println("item not found: "+item);
+                }
+
+            }
+        }
+        return itemWithLowestMis;
+    }
+
+    public static  List<Sequence> getPrunedMSGSPCandidates(List<Sequence> ck, HashMap<Integer, Double> minSupItems, Data data) {
+
+        System.out.println("Pruning:");
+        List<Sequence> unprunedSequences=new ArrayList<>();
+        for(Sequence seq:ck){
+            List<List<Integer>> seqCopy=Util.setToList(seq.getSequenceData());
+
+            int elementWithLowestMis=Util.getItemWithLeastMisValue(seq,minSupItems);
+            for(int i=0;i<seqCopy.size();i++){
+                List<Integer> set=seqCopy.get(i);
+                for(int j=0;j<set.size();j++){
+                    int removedItem=set.remove(j);
+                    if(set.isEmpty()){
+                        seqCopy.removeAll(set);
+                    }
+                    //this is the condition for pruning
+                    if(removedItem==elementWithLowestMis ){
+                        Sequence prunedSequence=makeSequenceFromList(seqCopy);
+                        float candidateSup=(float)Util.getcandidateCountForSequence(prunedSequence,data)/(float)data.getSequences().size();
+                        //only if the below criteria is satisfied it is added else it is pruned.
+                        if(candidateSup >= data.getItemMinSup().get(elementWithLowestMis)){
+                            unprunedSequences.add(seq);
+                        }
+                    }
+                    set.add(j,removedItem);
+                }
+            }
+
+        }
+        return new ArrayList<>();
+    }
+    private static Sequence makeSequenceFromList(List<List<Integer>> seqCopy) {
+        List<Set<Integer>> listOfSets=new ArrayList<>();
+        for(List<Integer> lists: seqCopy){
+            Set<Integer> set=new LinkedHashSet<>();
+            if(!lists.isEmpty()){
+
+                set.addAll(lists);
+            }
+            if(!set.isEmpty())
+                listOfSets.add(set);
+        }
+        return new Sequence(listOfSets);
+    }
+
+
+    public static int getcandidateCountForSequence(Sequence prunedSequence, Data data) {
+        int count=0;
+        for(Sequence sequence: data.getSequences()){
+            List<Set<Integer>> dataSequence = sequence.getSequenceData();
+                if(isFirstSubsetOfSecond(prunedSequence.getSequenceData(),dataSequence)){
+                count++;
+
+                }
+        }
+        return count;
     }
 }

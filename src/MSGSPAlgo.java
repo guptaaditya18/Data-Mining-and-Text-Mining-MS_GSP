@@ -40,7 +40,7 @@ public class MSGSPAlgo {
             }
             else if(k==2){
 
-                List<Sequence> CkGeneration = MScandidate_gen_SPM(new LinkedList<>(resultSeq.get(k-1).keySet()), new HashMap<>(sortedItemMinSup), tot, k-1);
+                List<Sequence> CkGeneration = MScandidate_gen_SPM(new LinkedList<>(resultSeq.get(k-1).keySet()), new HashMap<>(sortedItemMinSup), tot, k-1,data);
                 candidateCountMap = Util.getcandidateCount(CkGeneration, data);
             }
 
@@ -141,7 +141,7 @@ public class MSGSPAlgo {
 
     //Aditya Gupta
 
-        private List<Sequence> MScandidate_gen_SPM(List<Sequence> f2, HashMap<Integer, Double> minSupItems, int tot, int k){
+        private List<Sequence> MScandidate_gen_SPM(List<Sequence> f2, HashMap<Integer, Double> minSupItems, int tot, int k,Data data){
 
             List<Sequence> ck = new ArrayList<Sequence>();
             for(int i = 0; i < f2.size(); i++){
@@ -227,6 +227,7 @@ public class MSGSPAlgo {
                     }
 
                     //prune part
+                    List<Sequence> prunedCK = Util.getPrunedMSGSPCandidates(ck,minSupItems,data);
 
                 }
             }
@@ -237,6 +238,8 @@ public class MSGSPAlgo {
 
 
         }
+
+
     //associated with joinpart2
     private boolean checkEqualFunc4(List<Set<Integer>> s1, List<Set<Integer>> s2) {
         //Copy s1 and s2 to list s1Dash and s2Dash
