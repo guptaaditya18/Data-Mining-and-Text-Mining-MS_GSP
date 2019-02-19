@@ -18,8 +18,13 @@ public class InputDataUtil {
             String line;
 
 
+            int k=1;
             while((line = br.readLine()) != null) {
                 int len1 = line.length();
+                System.out.println(k++);
+                if(line.isEmpty()){
+                    continue;
+                }
                 String seq1 = line.substring(2, len1 - 2);
                 List<String> seq2 = Arrays.asList(seq1.split("}\\{"));
                 int len2 = seq2.size();

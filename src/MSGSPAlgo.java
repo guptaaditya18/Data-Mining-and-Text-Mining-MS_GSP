@@ -1,57 +1,105 @@
+import java.io.*;
 import java.util.*;
 
 public class MSGSPAlgo {
 
-    public void getFinalSequence(Data data){
+    public void getFinalSequence(Data data) throws FileNotFoundException {
+
+
+//        try {
+//            BufferedWriter bw = new BufferedWriter(new FileWriter("Data/src/output.txt"));
+
+        PrintStream o = new PrintStream(new File("Data/src/output3.txt"));
+
+        // Store current System.out before assigning a new value
+        PrintStream console = System.out;
+
+        System.setOut(o);
+
         List<HashMap<Sequence,Integer>> resultSeq=new ArrayList<>();
-        //Util.printSequence(data.getSequences());
-        int tot=data.getSequences().size();
+            //Util.printSequence(data.getSequences());
+            int tot=data.getSequences().size();
 
 
-        System.out.println(tot);
+            System.out.println(tot);
 
-        //Sort acc to MIS:
-        TreeMap<Integer, Double> sortedItemMinSup = Util.getSortedMapByvalue(data.getItemMinSup());
-
-
-        System.out.println("Sorted item min sup:");
-        System.out.println(sortedItemMinSup);
-
-        HashMap<Integer, Integer> itemCountMap = Util.getItemCountMap(data,data.getItemMinSup());
-        System.out.println("item count map");
-        System.out.println(itemCountMap);
-
-        Set<Integer> lvalues=getLvalues(new HashMap<>(sortedItemMinSup),data,itemCountMap,tot);
+            //Sort acc to MIS:
+            TreeMap<Integer, Double> sortedItemMinSup = Util.getSortedMapByvalue(data.getItemMinSup());
 
 
-        HashMap<Sequence,Integer> c1 = getFirstLevelSeq(lvalues, itemCountMap, new HashMap<>(sortedItemMinSup), tot);
-        //System.out.println("length 1 total number :"+c1.size());
-        //Util.printSequence(c1);
-        resultSeq.add(c1);
-        int k=1;
+            System.out.println("Sorted item min sup:");
+            String sortedItemMinSupString = "Sorted item min sup:";
+//            bw.write(sortedItemMinSupString);
+//            bw.close();
 
-        while(!resultSeq.get(k-1).isEmpty()){
+            System.out.println(sortedItemMinSup);
 
-            HashMap<Sequence, Integer> candidateCountMap = new HashMap<>();
-            if(k==1){
-                List<Sequence> c2Generation = getSecondLevelSequence(new HashMap<>(sortedItemMinSup), itemCountMap, lvalues, tot, data.getSDC());
-                //Util.printSequence(c2Generation);
-                candidateCountMap = Util.getcandidateCount(c2Generation, data);
+            HashMap<Integer, Integer> itemCountMap = Util.getItemCountMap(data,data.getItemMinSup());
+            System.out.println("item count map");
+            //bw.write(itemCountMap.toString());
+
+            Set<Integer> lvalues=getLvalues(new HashMap<>(sortedItemMinSup),data,itemCountMap,tot);
+
+
+            HashMap<Sequence,Integer> c1 = getFirstLevelSeq(lvalues, itemCountMap, new HashMap<>(sortedItemMinSup), tot);
+            //System.out.println("length 1 total number :"+c1.size());
+            //Util.printSequence(c1);
+            resultSeq.add(c1);
+            int k=1;
+
+            while(!resultSeq.get(k-1).isEmpty()){
+
+                HashMap<Sequence, Integer> candidateCountMap = new HashMap<>();
+                if(k==1){
+                    List<Sequence> c2Generation = getSecondLevelSequence(new HashMap<>(sortedItemMinSup), itemCountMap, lvalues, tot, data.getSDC());
+                    //Util.printSequence(c2Generation);
+                    candidateCountMap = Util.getcandidateCount(c2Generation, data);
+                }
+                else {
+
+                    List<Sequence> CkGeneration = MScandidate_gen_SPM(resultSeq.get(k-1), new HashMap<>(sortedItemMinSup), tot, k-1,data);
+                    candidateCountMap = Util.getcandidateCount(CkGeneration, data);
+                }
+
+
+                HashMap<Sequence, Integer> Fk = Util.convertCandidatesToFinalSequence(candidateCountMap, data, tot);
+
+                resultSeq.add(Fk);
+                System.out.println("count of Sequence of length : "+k+ " is: "+resultSeq.get(k-1).size());
+                Util.printSequence(resultSeq.get(k-1));
+                k++;
+
+//            break;
             }
-            else if(k==2){
-
-                List<Sequence> CkGeneration = MScandidate_gen_SPM(new LinkedList<>(resultSeq.get(k-1).keySet()), new HashMap<>(sortedItemMinSup), tot, k-1,data);
-                candidateCountMap = Util.getcandidateCount(CkGeneration, data);
-            }
+            //printInfile(resultSeq);
 
 
-            HashMap<Sequence, Integer> Fk = Util.convertCandidatesToFinalSequence(candidateCountMap, data, tot);
 
-            resultSeq.add(Fk);
-            System.out.println("count of Sequence of length : "+k+ " is: "+resultSeq.get(k-1).size());
-            Util.printSequence(resultSeq.get(k-1));
-            k++;
-        }
+
+
+
+//        }catch (IOException e){
+//            System.out.println("IO Exception");
+//        }
+
+
+//        Set<Integer> testSet=new LinkedHashSet<>(Arrays.asList(9,10));
+//        List<Set<Integer>> testList=new ArrayList<>();
+//        testList.add(testSet);
+//        Sequence seq1=new Sequence(testList);
+//        Set<Integer> testSet2=new LinkedHashSet<>(Arrays.asList(10));
+//        Set<Integer> testSet3=new LinkedHashSet<>(Arrays.asList(10));
+//        //Set<Integer> testSet2=new LinkedHashSet<>(Arrays.asList(10,13));
+//        List<Set<Integer>> testList2=new ArrayList<>();
+//        testList2.add(testSet2);
+//        testList2.add(testSet3);
+//        List<Set<Integer>> testList3=new ArrayList<>();
+//        testList2.add(testSet2);
+//        Sequence se2=new Sequence(testList2);
+//        List<Sequence> li=new ArrayList<>();
+//        li.add(seq1);
+//        li.add(se2);
+//        Util.printSequence(MScandidate_gen_SPM(li,new HashMap<>(sortedItemMinSup), tot, k-1,data));
 
 //        List<Sequence> c2Generation = getSecondLevelSequence(new HashMap<>(sortedItemMinSup), itemCountMap, lvalues, tot, data.getSDC());
 //        HashMap<Sequence, Integer> c2 = getcandidateCount(c2Generation, data);
@@ -137,13 +185,64 @@ public class MSGSPAlgo {
 
     }
 
+    private void printInfile(List<HashMap<Sequence, Integer>> resultSeq) {
+        FileOutputStream  f = null;
+        ObjectOutputStream o=null;
+        try {
+             f = new FileOutputStream("Data/src/output2.txt");
+             o= new ObjectOutputStream(f);
+
+            // Write objects to file
+            o.writeObject(resultSeq);
+            int k=1;
+            for(HashMap<Sequence, Integer> fvalues: resultSeq){
+                String str1="number of length " +k+"Frequency sequences: \n";
+                o.writeObject(str1);
+                //System.out.print("<");
+                for(Map.Entry<Sequence,Integer> entry:fvalues.entrySet()){
+                    String str= "<";
+                    for(Set<Integer> sets: entry.getKey().getSequenceData()){
+                        str+=sets.toString();
+                    }
+                    str+=">" + "\t"+ entry.getValue()+"\n";
+                    o.writeObject(str);
+                    //System.out.println(">" + "\t"+ entry.getValue());
+                }
+                k++;
+            }
+            //o.writeObject(p2);
+
+            o.close();
+            f.close();
+
+            //FileInputStream fi = new FileInputStream(new File("Data/src/output2.txt"));
+            //ObjectInputStream oi = new ObjectInputStream(fi);
+
+            // Read objects
+
+
+
+
+//            System.out.println(pr1.toString());
+//            System.out.println(pr2.toString());
+
+            //oi.close();
+            //fi.close();
+
+        } catch (FileNotFoundException e) {
+            System.out.println("File not found");
+        } catch (IOException e) {
+            System.out.println("Error initializing stream");
+        }
+    }
 
 
     //Aditya Gupta
 
-        private List<Sequence> MScandidate_gen_SPM(List<Sequence> f2, HashMap<Integer, Double> minSupItems, int tot, int k,Data data){
+        private List<Sequence> MScandidate_gen_SPM(HashMap<Sequence, Integer> fHashmap, HashMap<Integer, Double> minSupItems, int tot, int k, Data data){
 
             List<Sequence> ck = new ArrayList<Sequence>();
+            List<Sequence> f2 = new LinkedList<>(fHashmap.keySet());
             for(int i = 0; i < f2.size(); i++){
                 for(int j = 0; j < f2.size(); j++){
 
@@ -156,21 +255,18 @@ public class MSGSPAlgo {
                     int firstElementFromS1=s1.get(0).iterator().next();
                     int firstElementFromS2=s2.get(0).iterator().next();
 
-//                    System.out.print(s1+"\t"+firstElementFromS1);
-//                    System.out.println(s2+"\t"+firstElementFromS2);
-
                     //anoop - check if minsup of first element of s1 is less than the rest of the elements
-                    boolean flag = false;
+//                    boolean flag = false;
                     Double minsupFirstS1 = minSupItems.get(firstElementFromS1);
-                    for(Set<Integer> setFromS1:s1){
-                        for(int itemsFromS1:setFromS1){
-                            if(!flag){
-                                flag = true;
-                                continue;
-                            }else if(minsupFirstS1 >= minSupItems.get(itemsFromS1))
-                                firstElementSmallerThanRestCondition=false;
-                        }
-                    }
+//                    for(Set<Integer> setFromS1:s1){
+//                        for(int itemsFromS1:setFromS1){
+//                            if(!flag){
+//                                flag = true;
+//                                continue;
+//                            }else if(minsupFirstS1 >= minSupItems.get(itemsFromS1))
+//                                firstElementSmallerThanRestCondition=false;
+//                        }
+//                    }
 
                     //find last item of s2
                     Set<Integer> lastset = s2.get(s2.size()-1);
@@ -209,41 +305,48 @@ public class MSGSPAlgo {
 //                        }
 //                    }
                     LastElementSmallerThanRestCondition=(lastElementFromS2==Util.getItemWithLeastMisValue(f2.get(j),minSupItems))?true:false;
-//                    firstElementSmallerThanRestCondition=(firstElementFromS1==Util.getItemWithLeastMisValue(f2.get(j),minSupItems))?true:false;
+                    firstElementSmallerThanRestCondition=(firstElementFromS1==Util.getItemWithLeastMisValue(f2.get(j),minSupItems))?true:false;
 
                     //Join part
                     if(firstElementSmallerThanRestCondition){
 
+
                         if(checkEqualFunc1(s1,s2)) {
-                            System.out.println("if 1\t"+s1+"\t"+s2);
+//                            System.out.println("if 1\t"+s1+"\t"+s2);
                             ck.addAll(joinPartOne(s1, s2, firstElementFromS1, minsupFirstS1, lastElementFromS2, minsupLastS2, minSupItems, k));
                         }
                     }else if(LastElementSmallerThanRestCondition){
-                        System.out.println("if 2\t"+s1+"\t"+s2);
+                        //System.out.println("if 2\t"+s1+"\t"+s2);
                         if(checkEqualFunc2(s1, s2)){
 
+//                            System.out.println("yo bro");
                             ck.addAll(joinPartTwo(s1, s2, firstElementFromS1 , minsupFirstS1, firstElementFromS2 ,minsupLastS2, minSupItems, k));
                         }
 
                     }else{
 
                         if(checkEqualFunc3(s1, s2)){
-                            System.out.println("if 3\t"+s1+"\t"+s2);
-                            ck.addAll(joinPartOne(s1, s2, firstElementFromS1, minsupFirstS1, lastElementFromS2, minsupLastS2, minSupItems, k));
+//                            System.out.println("if 3\t"+s1+"\t"+s2);
+                            ck.addAll(joinPartThree(s1, s2, firstElementFromS1, minsupFirstS1, lastElementFromS2, minsupLastS2, minSupItems, k));
 
                         }else if(checkEqualFunc4(s1, s2)){
-                            System.out.println("if 4\t"+s1+"\t"+s2);
-                            ck.addAll(joinPartTwo(s1, s2, firstElementFromS1 , minsupFirstS1, firstElementFromS2 ,minsupLastS2, minSupItems, k));
+//                            System.out.println("if 4\t"+s1+"\t"+s2);
+                            ck.addAll(joinPartTwo(s1, s2, lastElementFromS2 , minsupFirstS1, firstElementFromS2 ,minsupLastS2, minSupItems, k));
 
                         }
                     }
 
                     //prune part
-                    List<Sequence> prunedCK = Util.getPrunedMSGSPCandidates(ck,minSupItems,data);
+                    List<Sequence> prunedCK = Util.getPrunedMSGSPCandidates(ck,minSupItems,data,fHashmap);
 
                 }
             }
-            return ck;
+            List<Sequence> ckdash = Util.removeDuplicates(ck);
+//                for(int i = 0; i < ck.size();i++){
+//                    System.out.println(ck.get(i).sequenceData);
+//                }
+
+            return ckdash;
 
 
         }
@@ -304,6 +407,43 @@ public class MSGSPAlgo {
 
         }
 
+        private  List<Sequence> joinPartThree( List<Set<Integer>> s1, List<Set<Integer>> s2, int firstElementFromS1, Double minsupFirstS1, int lastElementFromS2, Double minsupLastS2, HashMap<Integer, Double> minSupItems, int k){
+            List<Sequence> cklocal = new ArrayList<Sequence>();
+
+//                System.out.println("Inside minsup minsupLastS2 > minsupFirstS1" +(minsupLastS2 > minsupFirstS1));
+                //if the last item l in s2 is a separate element then
+                if(s2.get(s2.size()-1).size() == 1) {
+
+
+                    List<Set<Integer>> c1temp = new ArrayList<Set<Integer>>();
+                    for (Set<Integer> setFroms1 : s1) {
+                        Set<Integer> stemp = new LinkedHashSet<Integer>();
+                        for (Integer intfromset : setFroms1)
+                            stemp.add(intfromset);
+                        c1temp.add(stemp);
+                    }
+                    c1temp.add(s2.get(s2.size() - 1));
+                    Sequence c1 = new Sequence(c1temp);
+                    cklocal.add(c1);
+                }else if(s2.get(s2.size()-1).size() > 1){
+
+                    List<Set<Integer>> c1temp = new ArrayList<Set<Integer>>();
+                    for (Set<Integer> setFroms1 : s1) {
+                        Set<Integer> stemp = new LinkedHashSet<Integer>();
+                        for (Integer intfromset : setFroms1)
+                            stemp.add(intfromset);
+                        c1temp.add(stemp);
+                    }
+                    c1temp.get(c1temp.size()-1).add(lastElementFromS2);
+                    Sequence c1 = new Sequence(c1temp);
+                    cklocal.add(c1);
+
+                }
+
+
+            return cklocal;
+        }
+
 
 
         private  List<Sequence> joinPartOne( List<Set<Integer>> s1, List<Set<Integer>> s2, int firstElementFromS1, Double minsupFirstS1, int lastElementFromS2, Double minsupLastS2, HashMap<Integer, Double> minSupItems, int k){
@@ -316,8 +456,9 @@ public class MSGSPAlgo {
                 lastElementFromS1 = it.next();
             }
 
-            if(minsupLastS2 > minsupFirstS1){
+            if(minsupLastS2 >= minsupFirstS1){
 
+//                System.out.println("Inside minsup minsupLastS2 > minsupFirstS1" +(minsupLastS2 > minsupFirstS1));
                 //if the last item l in s2 is a separate element then
                 if(s2.get(s2.size()-1).size() == 1){
 
@@ -336,7 +477,7 @@ public class MSGSPAlgo {
 
                     //if (the length and the size of s1 are both 2) AND (the last item of s2 is
                     //greater than the last item of s1) then
-                    if ((s1.size() == 2 && s1.get(0).size()==1) && lastElementFromS2 > lastElementFromS1 ){
+                    if ((s1.size() == 2 && s1.get(0).size()==1) && (lastElementFromS2 > lastElementFromS1 )){
 
                         List<Set<Integer>> c2temp = new ArrayList<Set<Integer>>();
                         for (Set<Integer> setFroms1:s1){
@@ -354,7 +495,7 @@ public class MSGSPAlgo {
                 //else if ((the length of s1 is 2 and the size of s1 is 1) AND (the last item
                 //of s2 is greater than the last item of s1)) OR (the length of s1
                 //is greater than 2) then
-                }else if (((s1.size()==1 && s1.get(0).size() == 2) && (lastElementFromS2 > lastElementFromS1)) || k>3){
+                }else if (((s1.size()==1 && s1.get(0).size() == 2) && (lastElementFromS2 > lastElementFromS1)) || k>2){
                     List<Set<Integer>> c2temp = new ArrayList<Set<Integer>>();
                     for (Set<Integer> setFroms1:s1){
                         Set<Integer> stemp = new LinkedHashSet<Integer>();
@@ -389,6 +530,7 @@ public class MSGSPAlgo {
                 s2Dash.get(s2Dash.size()-1).remove((s2Dash.get(s2Dash.size()-1).size()) - 1);
 
             //checkEquality
+//            System.out.println(s1Dash+"\t"+s2Dash);
             if(s1Dash.equals(s2Dash))
                 return true;
 
@@ -409,6 +551,8 @@ public class MSGSPAlgo {
             //Candidate sequences are generated by prepending first item of s1 with s2
             //MIS value of the first item of s1 is greater than that of the last item of s2.
             if(minsupLastS2 <= minsupFirstS1){
+//
+//                System.out.println("yo yo yo");
 
                 //if the first item l in s1 is a separate element then
                 if(s1.get(0).size() == 1){
@@ -424,9 +568,9 @@ public class MSGSPAlgo {
                     Sequence c1 = new Sequence(c1temp);
                     cklocal.add(c1);
 
-                    //if (the length and the size of s1 are both 2) AND (the last item of s2 is
-                    //greater than the last item of s1) then
-                    if ((s2.size() == 2 && s2.get(0).size()==1) && firstElementFromS1 > firstElementFromS1 ){
+                    //if (the length and the size of s1 are both 2) AND (the last item of s1 is
+                    //greater than the last item of s2) then
+                    if ((s2.size() == 2 && s2.get(0).size()==1) && (firstElementFromS2 > firstElementFromS1) ){
 
                         List<Set<Integer>> c2temp = new ArrayList<Set<Integer>>();
                         for (Set<Integer> setFroms1:s2){
@@ -449,9 +593,9 @@ public class MSGSPAlgo {
                     }
 
                 //else if ((the length of s1 is 2 and the size of s1 is 1) AND (the last item
-                //of s2 is greater than the last item of s1)) OR (the length of s1
+                //of s1 is greater than the last item of s2)) OR (the length of s1
                 //is greater than 2) then
-                }else if (((s2.size()==1 && s2.get(0).size() == 2) && (firstElementFromS1 > firstElementFromS1)) || k>3){
+                }else if (((s2.size()==1 && s2.get(0).size() == 2) && (firstElementFromS2 > firstElementFromS1)) || k>3){
 
                     List<Set<Integer>> c2temp = new ArrayList<Set<Integer>>();
                     for (Set<Integer> setFroms1:s2){

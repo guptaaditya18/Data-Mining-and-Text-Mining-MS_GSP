@@ -247,8 +247,16 @@ public class Util {
         }
         return itemWithLowestMis;
     }
+    private static int getCandidateCountFromHashMap(Sequence prunedSequence, HashMap<Sequence, Integer> f2) {
+        for(Map.Entry<Sequence,Integer> entry:f2.entrySet()){
+            if(prunedSequence.getSequenceData().equals(entry.getKey().getSequenceData())){
+                return entry.getValue();
+            }
+        }
+        return 0;
+    }
 
-    public static  List<Sequence> getPrunedMSGSPCandidates(List<Sequence> ck, HashMap<Integer, Double> minSupItems, Data data) {
+    public static  List<Sequence> getPrunedMSGSPCandidates(List<Sequence> ck, HashMap<Integer, Double> minSupItems, Data data, HashMap<Sequence, Integer> fHashmap) {
 
 
         List<Sequence> unprunedSequences=new ArrayList<>();
@@ -266,7 +274,7 @@ public class Util {
                     //this is the condition for pruning
                     if(removedItem==elementWithLowestMis ){
                         Sequence prunedSequence=makeSequenceFromList(seqCopy);
-                        float candidateSup=(float)Util.getcandidateCountForSequence(prunedSequence,data)/(float)data.getSequences().size();
+                        float candidateSup=(float)Util.getCandidateCountFromHashMap(prunedSequence,fHashmap)/(float)data.getSequences().size();
                         //only if the below criteria is satisfied it is added else it is pruned.
                         if(candidateSup >= data.getItemMinSup().get(elementWithLowestMis)){
                             unprunedSequences.add(seq);
