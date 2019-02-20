@@ -1,6 +1,10 @@
 import java.util.HashMap;
 import java.util.List;
 
+
+/**
+ * Class for Storing the data in the needed format specified.
+ */
 public class Data {
     private List<Sequence> sequences;
     private HashMap<Integer,Double> itemMinSup;

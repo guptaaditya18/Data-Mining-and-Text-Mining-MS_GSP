@@ -7,36 +7,34 @@ import java.util.*;
 public class InputDataUtil {
 
 
-    public Data parseTxt(){
-//        System.out.println("hello");
-
-
-        List<Sequence> seq=new ArrayList<>();
-
-        try{
-        BufferedReader br = new BufferedReader(new FileReader("Data/src/sample.txt"));
+    // API for parsing the input into DATA format.
+    public Data parseTxt() {
+        List<Sequence> seq = new ArrayList<>();
+        try {
+            //Name of the file for input data.
+            BufferedReader br = new BufferedReader(new FileReader("Data/src/sample.txt"));
             String line;
 
 
-            int k=1;
-            while((line = br.readLine()) != null) {
+            int k = 1;
+            while ((line = br.readLine()) != null) {
                 int len1 = line.length();
-                System.out.println(k++);
-                if(line.isEmpty()){
+
+                if (line.isEmpty()) {
                     continue;
                 }
                 String seq1 = line.substring(2, len1 - 2);
                 List<String> seq2 = Arrays.asList(seq1.split("}\\{"));
                 int len2 = seq2.size();
 
-                List<Set<Integer>> seq3=new ArrayList<>();
+                List<Set<Integer>> seq3 = new ArrayList<>();
 
                 for (int i = 0; i < len2; i++) {
                     List<String> items = Arrays.asList(seq2.get(i).split(", "));
-                    Set<Integer> set1=new LinkedHashSet<>();
+                    Set<Integer> set1 = new LinkedHashSet<>();
 
                     int len3 = items.size();
-                    for(int j = 0; j < len3; j++){
+                    for (int j = 0; j < len3; j++) {
                         Integer it = Integer.parseInt(items.get(j));
                         set1.add(it);
                     }
@@ -44,32 +42,31 @@ public class InputDataUtil {
 
                 }
 
-                Sequence seq4=new Sequence(seq3);
+                Sequence seq4 = new Sequence(seq3);
                 seq.add(seq4);
             }
 
-            }catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             System.out.println("file not found");
-        }
-        catch( IOException e){
+        } catch (IOException e) {
             System.out.println("IO Exception");
         }
 
         HashMap<Integer, Double> mis = new LinkedHashMap<>();
         Double sdc = 0.0;
-        try{
+        try {
             BufferedReader br = new BufferedReader(new FileReader("Data/src/mis.txt"));
             String line;
-            while((line = br.readLine()) != null) {
-                if(line.charAt(0) == 'S'){
+            while ((line = br.readLine()) != null) {
+                if (line.charAt(0) == 'S') {
                     int len1 = line.length();
                     String seq1 = line.substring(6, len1);
                     Double db = Double.parseDouble(seq1);
                     sdc = db;
 
-                }else {
+                } else {
                     int len1 = line.length();
-                    String seq1 = line.substring(4, len1 );
+                    String seq1 = line.substring(4, len1);
                     List<String> seq2 = Arrays.asList(seq1.split("\\) = "));
 
                     Integer in = Integer.parseInt(seq2.get(0));
@@ -78,16 +75,14 @@ public class InputDataUtil {
                 }
             }
 
-        }catch (FileNotFoundException e){
+        } catch (FileNotFoundException e) {
             System.out.println("file not found");
-        }
-        catch( IOException e){
+        } catch (IOException e) {
             System.out.println("IO Exception");
         }
 
 
-
-        Data data = new Data(seq,mis,sdc);
+        Data data = new Data(seq, mis, sdc);
 
         return data;
     }

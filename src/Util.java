@@ -61,7 +61,7 @@ public class Util {
         }
         return candidateSequenceMap;
     }
-
+/*
     public static int getItemFromSequenceAtIndex(Sequence sequence, Index_of_Retrieval index){
 
         List<Set<Integer>> seq=sequence.getSequenceData();
@@ -116,23 +116,8 @@ public class Util {
 
         }
 
-    }
+    }*/
 
-//    public static boolean isFirstElementSmallerThanRest(Sequence sequence){
-//        boolean firstElementSmallerThanRestCondition=true;
-//        Double minsupFirstS1 = minSupItems.get(getItemFromSequenceAtIndex(sequence,Index_of_Retrieval.FIRST));
-//        for(Set<Integer> setFromS1:s1){
-//            for(int itemsFromS1:setFromS1){
-//                if(!flag){
-//                    flag = true;
-//                    continue;
-//                }
-//                if(minsupFirstS1 >= minSupItems.get(itemsFromS1))
-//                    firstElementSmallerThanRestCondition=false;
-//            }
-//        }
-//        return firstElementSmallerThanRestCondition;
-//    }
     private static List<Integer> convertSetListToIntegerList(List<Set<Integer>> sequenceList){
         List<Integer> list=new ArrayList<>();
         for(Set<Integer> sets:sequenceList){
