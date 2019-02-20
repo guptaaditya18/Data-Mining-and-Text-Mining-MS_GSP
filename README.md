@@ -7,5 +7,7 @@ Algorithm can be found in page 46.
 
 # Code Usage:
 Data file: add the data to Sample.txt
+
 MIS values: add MIS valus to mis.txt
+
 Output: File data_output contains the output for the given data.
